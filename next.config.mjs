@@ -9,6 +9,11 @@ const nextConfig = {
         hostname: "lovely-flamingo-139.convex.cloud",
         port: "",
       },
+      {
+        protocol: "https",
+        hostname: "",
+        port: "",
+      },
     ],
   },
 };
