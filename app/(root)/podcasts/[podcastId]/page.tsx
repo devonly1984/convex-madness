@@ -5,6 +5,7 @@ import PodcastCard from "@/components/PodcastCard";
 import PodcastDetailPlayer from "@/components/PodcastDetailPlayer";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import Image from "next/image";
 
@@ -16,9 +17,11 @@ const PodCastDetails = ({
   const podcast = useQuery(api.podcasts.getPodcastById, {
     podcastId,
   });
+  const { user } = useUser();
   const similarPodcasts = useQuery(api.podcasts.getPodcastByVoiceType, {
     podcastId,
   });
+  const isOwner = user?.id === podcast?.authorId;
   if (!similarPodcasts || !podcast) {
     return <LoaderSpinner />;
   }
@@ -36,7 +39,11 @@ const PodCastDetails = ({
           <h2 className="text-16 font-bold text-white-1">{podcast?.views}</h2>
         </figure>
       </header>
-      <PodcastDetailPlayer />
+      <PodcastDetailPlayer
+        podcastId={podcast?.id}
+        isOwner={isOwner}
+        {...podcast}
+      />
       <p className="text-white-2 text-16 pb-8 pt-[45px] font-medium max-md:text-center">
         {podcast?.podcastDescription}
       </p>

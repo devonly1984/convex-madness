@@ -205,3 +205,27 @@ export const deletePodcast = mutation({
     return await ctx.db.delete(args.podcastId);
   },
 });
+export const getTopUserByPodcastCount = query({
+  args: {},
+  handler: async(ctx,args)=>{
+    const user = ctx.db.query('users').collect();
+    const userData = await Promise.all(
+       user.map(async(u)=>{
+        const podcasts = await ctx.db
+          .query("podcasts")
+          .filter((q) => q.eq(q.field("authorId"), u.clerkId))
+          .collect();
+      
+      const sortedPodcasts = podcasts.sort((a,b)=>b.views - a.views)
+      return {
+        ...u,
+        totalPodcasts: podcasts.length,
+        podcast: sortedPodcasts.map(p=>({
+          podcastTitle: p.podcastTitle,
+          podcastId: p._id
+        }))
+      }
+    })
+    )
+  }
+})
