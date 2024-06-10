@@ -13,8 +13,8 @@ import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
 
 const PodcastDetailPlayer = ({
-  audioUrl,
   podcastTitle,
+  audioUrl,
   author,
   imageUrl,
   podcastId,

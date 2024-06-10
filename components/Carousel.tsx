@@ -1,23 +1,27 @@
 "use client"
-import  { FC, useCallback } from 'react'
-import { EmblaOptionsType, EmblaCarouselType } from 'embla-carousel'
+import  {  useCallback } from 'react'
+import { EmblaCarouselType } from "embla-carousel";
 import { DotButton, useDotButton } from './EmblaCarouselDotButton'
 import Autoplay from 'embla-carousel-autoplay'
 import useEmblaCarousel from 'embla-carousel-react'
 import { CarouselProps } from '@/types'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image';
+
+import { podcastData } from '@/contants';
 
 
 
-const Carousel: FC<PropType> = ({ fansLikeDetail }: CarouselProps) => {
+const Carousel = ({ fansLikeDetail }: CarouselProps) => {
   const router = useRouter();
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [Autoplay()]);
 
   const onNavButtonClick = useCallback((emblaApi: EmblaCarouselType) => {
     const autoplay = emblaApi?.plugins()?.autoplay;
-    if (!autoplay || (!"stopOnInteraction") in autoplay.options) return;
+    if (!autoplay) return;
 
     const resetOrStop =
+      //@ts-ignore
       autoplay.options.stopOnInteraction === false
         ? (autoplay.reset as () => void)
         : (autoplay.stop as () => void);
@@ -29,33 +33,46 @@ const Carousel: FC<PropType> = ({ fansLikeDetail }: CarouselProps) => {
     emblaApi,
     onNavButtonClick
   );
-  const slides =
-    fansLikeDetail && fansLikeDetail?.filter((item) => item.totalPodcasts > 0);
-
+  /*const slides =
+    fansLikeDetail &&
+    fansLikeDetail?.filter((item: any) => item.totalPodcasts > 0);*/
+  //if (!slides) return <LoaderSpinner />;
   return (
-    <section className="embla">
-      <div className="embla__viewport" ref={emblaRef}>
-        <div className="embla__container">
-          {slides.map((index) => (
-            <div className="embla__slide" key={index}>
-              <div className="embla__slide__number">{index + 1}</div>
+    <section
+      className="flex w-full flex-col gap-4 overflow-hidden"
+      ref={emblaRef}
+    >
+      <div className="flex">
+        {podcastData.slice(0, 5).map((item) => (
+          <figure
+            key={item.id}
+            className="carousel_box"
+            onClick={() => router.push(`/podcasts/${item.id}`)}
+          >
+            <Image
+              src={item.imgURL}
+              alt="card"
+              fill
+              className="absolute size-full rounded-xl border-none"
+            />
+            <div className="glassmorphism-black relative z-10 flex flex-col rounded-b-xl p-4">
+              <h2 className="text-14 font-semibold text-white-1">
+                {item.title}
+              </h2>
+              <p className="text-12 font-normal text-white-2">{item.title}</p>
             </div>
-          ))}
-        </div>
+          </figure>
+        ))}
       </div>
 
-      <div className="embla__controls">
-        <div className="embla__dots">
-          {scrollSnaps.map((_, index) => (
-            <DotButton
-              key={index}
-              onClick={() => onDotButtonClick(index)}
-              className={"embla__dot".concat(
-                index === selectedIndex ? " embla__dot--selected" : ""
-              )}
-            />
-          ))}
-        </div>
+      <div className="flex justify-center gap-2">
+        {scrollSnaps.map((_, index) => (
+          <DotButton
+            key={index}
+            onClick={() => onDotButtonClick(index)}
+            selected={index === selectedIndex}
+          />
+        ))}
       </div>
     </section>
   );

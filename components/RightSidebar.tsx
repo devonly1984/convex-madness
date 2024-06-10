@@ -6,13 +6,24 @@ import Carousel from "./Carousel";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import LoaderSpinner from "./LoaderSpinner";
+import { cn } from "@/lib/utils";
+import { useAudio } from "@/providers/AudioProvider";
 
 
 const RightSidebar = () => {
   const {user} = useUser();
   const topPodcasters = useQuery(api.podcasts.getTopUserByPodcastCount)
+  const router = useRouter()
+  const { audio } = useAudio();
+//  if (!topPodcasters) return <LoaderSpinner />;
   return (
-    <section className="right_sidebar text-white-1">
+    <section
+      className={cn("right_sidebar h-[calc(100vh-5px)]", {
+        "h-[calc(100vh-140px)]": audio?.audioUrl,
+      })}
+    >
       <SignedIn>
         <Link href={`/profile/${user?.id}`} className="flex gap-3 pb-12">
           <UserButton />
@@ -31,7 +42,38 @@ const RightSidebar = () => {
       </SignedIn>
       <section>
         <Header headerTitle="Fans Like You" />
-        <Carousel fansLikeDetail={topPodcasters} />
+        <Carousel fansLikeDetail={topPodcasters!} />
+      </section>
+      <section className="flex flex-col gap-8 pt-12">
+        <Header headerTitle="Top Podcasters" />
+        <div className="flex flex-col gap-6">
+          {topPodcasters &&
+            topPodcasters?.slice(0, 4).map((podcaster) => (
+              <div
+                key={podcaster.id}
+                className="flex justify-between cursor-pointer"
+                onClick={() => router.push(`/profile/${podcaster.clerkId}`)}
+              >
+                <figure className="flex items-center gap-2">
+                  <Image
+                    src={podcaster.imgUrl}
+                    alt={podcaster.name}
+                    height={44}
+                    width={44}
+                    className="aspect-square rounded-lg"
+                  />
+                  <h2 className="text-14 font-semibold text-white-1">
+                    {podcaster.name}
+                  </h2>
+                </figure>
+                <div className="flex items-center">
+                  <p className="text-12 font-normal">
+                    {podcaster.totalPodcasts} podcasts
+                  </p>
+                </div>
+              </div>
+            ))}
+        </div>
       </section>
     </section>
   );

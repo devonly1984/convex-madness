@@ -1,5 +1,6 @@
-import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react";
+import { ButtonHTMLAttributes, DetailedHTMLProps, FC, PropsWithChildren, useCallback, useEffect, useState } from "react";
   import { EmblaCarouselType } from 'embla-carousel'
+import { cn } from "@/lib/utils";
   
   type UseDotButtonType = {
     selectedIndex: number;
@@ -51,15 +52,25 @@ import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react";
       ButtonHTMLAttributes<HTMLButtonElement>,
       HTMLButtonElement
     >
-  >
-  
-  export const DotButton: FC<PropType> = (props) => {
-    const { children, ...restProps } = props
+  >;
+  type DotButtonProps = {
+    selected: boolean;
+    onClick:()=>void;
+  }
+  export const DotButton: FC<DotButtonProps> = ({selected,onClick}) => {
+
   
     return (
-      <button type="button" {...restProps}>
-        {children}
-      </button>
-    )
+      <button
+        type="button"
+        onClick={onClick}
+        className={cn(
+          "size-2.5 bg-white-3 cursor-pointer transition-all duration-500 rounded-full ",
+          {
+            "bg-white-1": selected,
+          }
+        )}
+      />
+    );
   }
   

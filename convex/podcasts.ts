@@ -208,7 +208,7 @@ export const deletePodcast = mutation({
 export const getTopUserByPodcastCount = query({
   args: {},
   handler: async(ctx,args)=>{
-    const user = ctx.db.query('users').collect();
+    const user = await ctx.db.query("users").collect();
     const userData = await Promise.all(
        user.map(async(u)=>{
         const podcasts = await ctx.db
